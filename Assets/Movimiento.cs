@@ -10,13 +10,17 @@ public class MovimientoPorCasilla : MonoBehaviour
     private bool atacando = false;
     private bool aturdido = false;
     private bool castigoPendiente = false;
-
+    private bool movimientoAdelante = false; // NUEVO: bandera para W
     private Vector3 destino;
     private Vector3 posicionAnterior;
-
     private Renderer rend;
     private Color colorOriginal;
-    public Animator animator;
+    public Animator animator; // Animator del personaje hijo
+    public GameObject efectoAturdido;
+    public GameObject efectoAtaqueEnemigo;
+    public GameObject efectoAtaqueUsuario;
+    public GameObject efectoMuerte;
+
 
     void Start()
     {
@@ -25,8 +29,6 @@ public class MovimientoPorCasilla : MonoBehaviour
 
         rend = GetComponent<Renderer>();
         colorOriginal = rend.material.color;
-
-        //animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -34,23 +36,18 @@ public class MovimientoPorCasilla : MonoBehaviour
         if (aturdido)
             return;
 
-        // Movimiento suave
-        if (transform.position != destino)
-        {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                destino,
-                velocidadMovimiento * Time.deltaTime
-            );
-        }
+        Vector3 direccion = Vector3.zero;
 
-        // Input
+        // Input de movimiento
         if (!moviendo && !atacando && transform.position == destino)
         {
-            Vector3 direccion = Vector3.zero;
+            movimientoAdelante = false; // Reset al inicio
 
-            if (Input.GetKeyDown(KeyCode.W)) direccion = Vector3.forward;
-            if (Input.GetKeyDown(KeyCode.S)) direccion = Vector3.back;
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                direccion = Vector3.forward;
+                movimientoAdelante = true; // Activamos flag para W
+            }
             if (Input.GetKeyDown(KeyCode.A)) direccion = Vector3.left;
             if (Input.GetKeyDown(KeyCode.D)) direccion = Vector3.right;
 
@@ -60,9 +57,29 @@ public class MovimientoPorCasilla : MonoBehaviour
                 destino = transform.position + direccion * tamañoCasilla;
                 moviendo = true;
 
-                // Animación de caminar
-                animator.SetBool("isMoving", true);
+                // Animación de caminar solo si es lateral
+                if (!movimientoAdelante)
+                    animator.SetBool("isMoving", true);
             }
+        }
+
+        // Guardamos la posición del personaje antes de mover el cubo
+        Vector3 personajePosicion = animator.transform.position;
+
+        // Movimiento del cubo
+        if (transform.position != destino)
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                destino,
+                velocidadMovimiento * Time.deltaTime
+            );
+        }
+
+        // Mantener al personaje en su lugar si va hacia adelante
+        if (movimientoAdelante)
+        {
+            animator.transform.position = personajePosicion;
         }
 
         // Al llegar al destino
@@ -70,7 +87,11 @@ public class MovimientoPorCasilla : MonoBehaviour
         {
             moviendo = false;
 
-            animator.SetBool("isMoving", false);
+            // Solo desactivar caminar si era lateral
+            if (!movimientoAdelante)
+                animator.SetBool("isMoving", false);
+
+            movimientoAdelante = false;
 
             if (atacando)
                 atacando = false;
@@ -80,7 +101,6 @@ public class MovimientoPorCasilla : MonoBehaviour
                 castigoPendiente = false;
                 StartCoroutine(Aturdir());
             }
-
         }
     }
 
@@ -92,8 +112,12 @@ public class MovimientoPorCasilla : MonoBehaviour
             destino = posicionAnterior;
             moviendo = true;
 
-            //Trigger de ataque
-            animator.SetTrigger("attack");
+            // Animación de ataque del personaje
+            animator.SetTrigger("attack2");
+
+
+            // Activar efecto de golpe con retardo
+            if (efectoAtaqueUsuario != null) StartCoroutine(ActivarEfectoConRetardo(efectoAtaqueUsuario, 0.5f));
         }
 
         if (other.CompareTag("Pared") && !aturdido)
@@ -101,6 +125,9 @@ public class MovimientoPorCasilla : MonoBehaviour
             castigoPendiente = true;
             destino = posicionAnterior;
             moviendo = true;
+
+            // Activar efecto de inmediato al colisionar
+            if (efectoAturdido != null) efectoAturdido.SetActive(true);
         }
     }
 
@@ -108,19 +135,32 @@ public class MovimientoPorCasilla : MonoBehaviour
     {
         aturdido = true;
 
-        // Activar animación de aturdido
+        // Animación de aturdido en el personaje
         animator.SetBool("isDizzy", true);
 
-        // CAMBIO DE COLOR
+        // Cambio de color del cubo
         rend.material.color = Color.yellow;
 
         yield return new WaitForSeconds(1f);
 
-        // VOLVER AL COLOR ORIGINAL
+        // Desactivar el efecto
+        if (efectoAturdido != null) efectoAturdido.SetActive(false);
+
         rend.material.color = colorOriginal;
         aturdido = false;
 
-        // Acabar animación de aturdido
+        // Terminar animación de aturdido
         animator.SetBool("isDizzy", false);
+    }
+
+    // Coroutine para activar un efecto tras un retardo
+    IEnumerator ActivarEfectoConRetardo(GameObject efecto, float delay)
+    {
+        yield return new WaitForSeconds(delay); // Espera el tiempo deseado
+        efecto.SetActive(true);
+
+        // Si quieres que se desactive automáticamente tras un tiempo, puedes hacer:
+        // yield return new WaitForSeconds(0.5f); // tiempo activo del efecto
+        // efecto.SetActive(false);
     }
 }
