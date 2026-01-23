@@ -5322,7 +5322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
-  targetTag: 
+  targetTag: Enemy
 --- !u!114 &404545970
 MonoBehaviour:
   m_ObjectHideFlags: 0
