@@ -1,18 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DamageDealer : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public int damage = 1;
+    public string targetTag;
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
+        Debug.Log($"[DAMAGE] {name} colisiona con {other.name}");
+
+        if (!other.CompareTag(targetTag))
+        {
+            Debug.Log($"[DAMAGE] Tag incorrecto ({other.tag}), esperado: {targetTag}");
+            return;
+        }
+
+        Health health = other.GetComponent<Health>();
+
+        if (health == null)
+        {
+            Debug.Log($"[DAMAGE] {other.name} no tiene Health");
+            return;
+        }
+
+        Debug.Log($"[DAMAGE] {name} hace {damage} daño a {other.name}");
+        health.TakeDamage(damage);
     }
 }

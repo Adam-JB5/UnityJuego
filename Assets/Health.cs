@@ -1,18 +1,46 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public int maxHealth = 3;
+    public int currentHealth;
+
+    public bool isDead { get; private set; }
+
+    void Awake()
     {
-        
+        currentHealth = maxHealth;
+        isDead = false;
+
+        Debug.Log($"[HEALTH] {name} inicia con {currentHealth}/{maxHealth} HP");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void TakeDamage(int amount)
     {
-        
+        if (isDead)
+        {
+            Debug.Log($"[HEALTH] {name} ya está muerto. Daño ignorado.");
+            return;
+        }
+
+        currentHealth -= amount;
+
+        Debug.Log($"[HEALTH] {name} recibe {amount} daño → {currentHealth}/{maxHealth} HP");
+
+        if (currentHealth <= 0)
+        {
+            currentHealth = 0;
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        isDead = true;
+
+        Debug.Log($"[HEALTH] {name} HA MUERTO ☠️");
+
+        // Aviso a otros scripts (animación, drop, etc.)
+        SendMessage("OnDeath", SendMessageOptions.DontRequireReceiver);
     }
 }
