@@ -5337,6 +5337,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 3
   currentHealth: 0
+  animator: {fileID: 0}
 --- !u!1 &505845701
 GameObject:
   m_ObjectHideFlags: 0
@@ -5418,8 +5419,8 @@ GameObject:
   - component: {fileID: 571664397}
   - component: {fileID: 571664396}
   - component: {fileID: 571664395}
-  - component: {fileID: 571664394}
   - component: {fileID: 571664400}
+  - component: {fileID: 571664401}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -5427,25 +5428,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &571664394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 571664393}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e10253d23441a54cb506e5d44f55f86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  "tama\xF1oCasilla": 12
-  velocidadMovimiento: 20
-  animator: {fileID: 0}
-  efectoAturdido: {fileID: 0}
-  efectoAtaqueEnemigo: {fileID: 0}
-  efectoAtaqueUsuario: {fileID: 0}
-  efectoMuerte: {fileID: 0}
 --- !u!54 &571664395
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5574,6 +5556,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 3
   currentHealth: 0
+  animator: {fileID: 970299076}
+--- !u!114 &571664401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 571664393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5e21a7bd4d8fec4a84dea488b004b87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modoActual: 0
+  "tama\xF1oCasilla": 12
+  velocidadMovimiento: 20
+  tiempoEntrePasos: 1.5
+  limiteIzquierda: 4
+  limiteDerecha: 0
+  animator: {fileID: 970299076}
 --- !u!1 &618074049
 GameObject:
   m_ObjectHideFlags: 0
@@ -11209,6 +11211,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 42.092, y: 0, z: 0}
+--- !u!95 &970299076 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95706204029656638, guid: e2aafa8770d34a9591b41bedf4e318ba, type: 3}
+  m_PrefabInstance: {fileID: 1520913545}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1268103753
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11445,7 +11452,7 @@ PrefabInstance:
     - target: {fileID: 95706204029656638, guid: e2aafa8770d34a9591b41bedf4e318ba, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 3c86476a392d01b4fb6736870aafee41, type: 2}
+      objectReference: {fileID: 9100000, guid: 44ab2b1a91e8aae41baec7dbdf0d6592, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

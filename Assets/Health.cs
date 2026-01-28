@@ -7,25 +7,29 @@ public class Health : MonoBehaviour
 
     public bool isDead { get; private set; }
 
+    [Header("Referencias")]
+    public Animator animator; // Arrastra el Animator aquí
+
     void Awake()
     {
         currentHealth = maxHealth;
         isDead = false;
 
-        Debug.Log($"[HEALTH] {name} inicia con {currentHealth}/{maxHealth} HP");
+        // Si no asignaste el animator manualmente, intenta buscarlo
+        if (animator == null) animator = GetComponentInChildren<Animator>();
     }
 
     public void TakeDamage(int amount)
     {
-        if (isDead)
-        {
-            Debug.Log($"[HEALTH] {name} ya está muerto. Daño ignorado.");
-            return;
-        }
+        if (isDead) return;
 
         currentHealth -= amount;
 
-        Debug.Log($"[HEALTH] {name} recibe {amount} daño → {currentHealth}/{maxHealth} HP");
+        // 1. DISPARAR ANIMACIÓN DE GOLPE (Hurt/GetHit)
+        if (animator != null && currentHealth > 0)
+        {
+            animator.SetTrigger("hit");
+        }
 
         if (currentHealth <= 0)
         {
@@ -36,11 +40,26 @@ public class Health : MonoBehaviour
 
     void Die()
     {
+        if (isDead) return; // Seguridad extra
         isDead = true;
 
-        Debug.Log($"[HEALTH] {name} HA MUERTO ☠️");
+        if (animator != null)
+        {
+            // Forzamos el estado de muerte
+            animator.SetBool("isDead", true);
 
-        // Aviso a otros scripts (animación, drop, etc.)
+            // Opcional: Si tienes otras capas de animación (como una de ataque), 
+            // pon su peso en 0 para que no interfieran con la muerte.
+            // animator.SetLayerWeight(1, 0f); 
+        }
+
+        // Detenemos todas las corrutinas de este objeto (como la de movimiento)
+        StopAllCoroutines();
+
+        // Desactivamos el script de movimiento específicamente
+        var movimiento = GetComponent<EnemigoModularInteligente>();
+        if (movimiento != null) movimiento.enabled = false;
+
         SendMessage("OnDeath", SendMessageOptions.DontRequireReceiver);
     }
 }
