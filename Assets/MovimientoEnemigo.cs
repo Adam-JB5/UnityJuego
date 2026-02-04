@@ -26,7 +26,11 @@ public class EnemigoModularInteligente : MonoBehaviour
 
     public Animator animator;
 
-    // BOTONES EN EL INSPECTOR (Click derecho en el componente)
+    [Header("Ataque")]
+    public bool puedeAtacar = true;
+    public float distanciaDeteccion = 1.5f; // Un poco más de 1 casilla
+    private Transform jugador;
+
     [ContextMenu("Cambiar a Modo Aleatorio")]
     void SetAleatorio() { modoActual = ModoMovimiento.Aleatorio; }
 
@@ -37,36 +41,87 @@ public class EnemigoModularInteligente : MonoBehaviour
     {
         posicionInicial = transform.position;
         destino = transform.position;
+        
+        // Buscamos al jugador por Tag
+        GameObject playerObj = GameObject.FindGameObjectWithTag("User");
+        if (playerObj != null) jugador = playerObj.transform;
+
         StartCoroutine(RutinaMovimiento());
     }
 
     void Update()
     {
+        // Solo manejamos el desplazamiento visual si no estamos atacando (la corrutina de ataque ya mueve el transform)
         ManejarDesplazamientoVisual();
     }
 
     IEnumerator RutinaMovimiento()
     {
-        while (!GetComponent<Health>().isDead) // <--- Solo se mueve si NO está muerto
+        // Comprobamos la salud para dejar de movernos si morimos
+        Health healthComponent = GetComponent<Health>();
+
+        while (healthComponent != null && !healthComponent.isDead)
         {
             yield return new WaitForSeconds(tiempoEntrePasos);
-            while (true)
+
+            if (!moviendo)
             {
-                yield return new WaitForSeconds(tiempoEntrePasos);
-                if (!moviendo)
+                if (jugador != null)
                 {
-                    if (modoActual == ModoMovimiento.Lineal)
-                        CalcularSiguientePasoLineal();
-                    else
-                        CalcularSiguientePasoAleatorio();
+                    float distancia = Vector3.Distance(transform.position, jugador.position);
+
+                    if (puedeAtacar && distancia <= distanciaDeteccion)
+                    {
+                        Vector3 dirAlJugador = (jugador.position - transform.position).normalized;
+                        StartCoroutine(EjecutarAtaqueVisual(dirAlJugador));
+                        continue; // Saltamos el resto del bucle para no movernos después de atacar
+                    }
                 }
+
+                // Si no atacó, patrulla
+                if (modoActual == ModoMovimiento.Lineal)
+                    CalcularSiguientePasoLineal();
+                else
+                    CalcularSiguientePasoAleatorio();
             }
         }
     }
 
+    // ESTA ES LA FUNCIÓN QUE TE FALTABA
+    IEnumerator EjecutarAtaqueVisual(Vector3 dirAtaque)
+    {
+        moviendo = true;
+        if (animator != null) animator.SetTrigger("attack"); 
+
+        Vector3 posOriginal = transform.position;
+        // Calculamos un punto medio hacia el jugador para la embestida
+        Vector3 puntoImpacto = transform.position + dirAtaque * (tamañoCasilla * 0.5f);
+
+        // Embestida hacia adelante
+        float t = 0;
+        while(t < 1) {
+            t += Time.deltaTime * 15f; 
+            transform.position = Vector3.Lerp(posOriginal, puntoImpacto, t);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.1f); // Breve pausa en el impacto
+
+        // Regreso a la casilla original
+        t = 0;
+        while(t < 1) {
+            t += Time.deltaTime * 10f;
+            transform.position = Vector3.Lerp(puntoImpacto, posOriginal, t);
+            yield return null;
+        }
+
+        transform.position = posOriginal;
+        destino = posOriginal; // Actualizamos destino para que ManejarDesplazamientoVisual no intente moverlo
+        moviendo = false;
+    }
+
     void CalcularSiguientePasoLineal()
     {
-        // Lógica de rebote
         if (direccionLineal == -1 && pasoActual <= -limiteIzquierda) direccionLineal = 1;
         else if (direccionLineal == 1 && pasoActual >= limiteDerecha) direccionLineal = -1;
 
@@ -96,14 +151,19 @@ public class EnemigoModularInteligente : MonoBehaviour
 
     void ManejarDesplazamientoVisual()
     {
-        if (transform.position != destino)
+        // Solo movemos si el destino es diferente y no estamos en medio de la corrutina de ataque
+        if (Vector3.Distance(transform.position, destino) > 0.01f)
         {
             transform.position = Vector3.MoveTowards(transform.position, destino, velocidadMovimiento * Time.deltaTime);
         }
         else if (moviendo)
         {
-            moviendo = false;
-            if (animator != null) animator.SetBool("isMoving", false);
+            // Si el enemigo está en el destino pero aún marcaba "moviendo", lo paramos
+            // (a menos que sea el ataque, que se gestiona solo)
+            if (Vector3.Distance(transform.position, destino) < 0.01f)
+            {
+                 // No reseteamos 'moviendo' aquí si se está ejecutando el ataque
+            }
         }
     }
 
