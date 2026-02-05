@@ -18,106 +18,109 @@ public class EnemigoModularInteligente : MonoBehaviour
     public int limiteIzquierda = 4;
     public int limiteDerecha = 0;
 
+    [Header("Probabilidad de Ataque")]
+    [Range(0, 100)]
+    public int probabilidadAtaque = 30;
+    public Vector3 direccionAtaque = Vector3.forward;
+
     private Vector3 posicionInicial;
     private Vector3 destino;
+    private Vector3 posicionAnterior;
     private bool moviendo = false;
+    private bool atacando = false;
     private int pasoActual = 0;
-    private int direccionLineal = -1; // -1 izq, 1 der
+    private int direccionLineal = -1;
 
     public Animator animator;
-
-    [Header("Ataque")]
-    public bool puedeAtacar = true;
-    public float distanciaDeteccion = 1.5f; // Un poco más de 1 casilla
-    private Transform jugador;
-
-    [ContextMenu("Cambiar a Modo Aleatorio")]
-    void SetAleatorio() { modoActual = ModoMovimiento.Aleatorio; }
-
-    [ContextMenu("Cambiar a Modo Lineal")]
-    void SetLineal() { modoActual = ModoMovimiento.Lineal; }
+    public GameObject efectoAtaqueEnemigo;
 
     void Start()
     {
         posicionInicial = transform.position;
         destino = transform.position;
-        
-        // Buscamos al jugador por Tag
-        GameObject playerObj = GameObject.FindGameObjectWithTag("User");
-        if (playerObj != null) jugador = playerObj.transform;
-
+        posicionAnterior = transform.position;
         StartCoroutine(RutinaMovimiento());
     }
 
     void Update()
     {
-        // Solo manejamos el desplazamiento visual si no estamos atacando (la corrutina de ataque ya mueve el transform)
+        // El motor de movimiento siempre corre, igual que en tu usuario
         ManejarDesplazamientoVisual();
     }
 
     IEnumerator RutinaMovimiento()
     {
-        // Comprobamos la salud para dejar de movernos si morimos
         Health healthComponent = GetComponent<Health>();
 
         while (healthComponent != null && !healthComponent.isDead)
         {
             yield return new WaitForSeconds(tiempoEntrePasos);
 
-            if (!moviendo)
+            if (!moviendo && !atacando)
             {
-                if (jugador != null)
+                int dado = Random.Range(0, 101);
+
+                if (dado <= probabilidadAtaque)
                 {
-                    float distancia = Vector3.Distance(transform.position, jugador.position);
-
-                    if (puedeAtacar && distancia <= distanciaDeteccion)
-                    {
-                        Vector3 dirAlJugador = (jugador.position - transform.position).normalized;
-                        StartCoroutine(EjecutarAtaqueVisual(dirAlJugador));
-                        continue; // Saltamos el resto del bucle para no movernos después de atacar
-                    }
+                    StartCoroutine(AtacarComoUsuario());
                 }
-
-                // Si no atacó, patrulla
-                if (modoActual == ModoMovimiento.Lineal)
-                    CalcularSiguientePasoLineal();
                 else
-                    CalcularSiguientePasoAleatorio();
+                {
+                    if (modoActual == ModoMovimiento.Lineal)
+                        CalcularSiguientePasoLineal();
+                    else
+                        CalcularSiguientePasoAleatorio();
+                }
             }
         }
     }
 
-    // ESTA ES LA FUNCIÓN QUE TE FALTABA
-    IEnumerator EjecutarAtaqueVisual(Vector3 dirAtaque)
+    // LÓGICA DE ATAQUE IGUAL A LA DEL USUARIO (W)
+    IEnumerator AtacarComoUsuario()
     {
+        atacando = true;
+        posicionAnterior = transform.position;
+
+        // Seteamos el destino hacia adelante (como el W del usuario)
+        destino = transform.position + direccionAtaque * tamañoCasilla;
         moviendo = true;
-        if (animator != null) animator.SetTrigger("attack"); 
 
-        Vector3 posOriginal = transform.position;
-        // Calculamos un punto medio hacia el jugador para la embestida
-        Vector3 puntoImpacto = transform.position + dirAtaque * (tamañoCasilla * 0.5f);
+        if (animator != null) animator.SetTrigger("attack"); // Ajusta el nombre si es attack2
 
-        // Embestida hacia adelante
-        float t = 0;
-        while(t < 1) {
-            t += Time.deltaTime * 15f; 
-            transform.position = Vector3.Lerp(posOriginal, puntoImpacto, t);
-            yield return null;
+        // Esperamos a que llegue al destino (el impacto)
+        yield return new WaitUntil(() => transform.position == destino);
+
+        // Pequeña pausa de impacto (opcional)
+        yield return new WaitForSeconds(0.1f);
+
+        // Volver automáticamente (como tu "volverAutomaticamente = true")
+        destino = posicionAnterior;
+        moviendo = true;
+
+        // Esperamos a que vuelva
+        yield return new WaitUntil(() => transform.position == destino);
+
+        atacando = false;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("User") || other.CompareTag("Player"))
+        {
+            // El enemigo siempre vuelve a su casilla al tocar al jugador
+            destino = posicionAnterior;
+            moviendo = true;
+
+            if (efectoAtaqueEnemigo != null)
+            {
+                efectoAtaqueEnemigo.SetActive(false);
+                efectoAtaqueEnemigo.SetActive(true);
+            }
+
+            // Opcional: Si quieres detener la corrutina de ataque para que no intente seguir avanzando
+            StopCoroutine("AtacarComoUsuario");
+            atacando = false;
         }
-
-        yield return new WaitForSeconds(0.1f); // Breve pausa en el impacto
-
-        // Regreso a la casilla original
-        t = 0;
-        while(t < 1) {
-            t += Time.deltaTime * 10f;
-            transform.position = Vector3.Lerp(puntoImpacto, posOriginal, t);
-            yield return null;
-        }
-
-        transform.position = posOriginal;
-        destino = posOriginal; // Actualizamos destino para que ManejarDesplazamientoVisual no intente moverlo
-        moviendo = false;
     }
 
     void CalcularSiguientePasoLineal()
@@ -143,36 +146,36 @@ public class EnemigoModularInteligente : MonoBehaviour
 
     void EjecutarMovimiento(int direccion)
     {
+        posicionAnterior = transform.position;
         pasoActual += direccion;
+        // Importante: Usamos Vector3.right para la patrulla lateral
         destino = posicionInicial + (Vector3.right * (pasoActual * tamañoCasilla));
         moviendo = true;
+
         if (animator != null) animator.SetBool("isMoving", true);
     }
 
     void ManejarDesplazamientoVisual()
     {
-        // Solo movemos si el destino es diferente y no estamos en medio de la corrutina de ataque
-        if (Vector3.Distance(transform.position, destino) > 0.01f)
+        if (transform.position != destino)
         {
-            transform.position = Vector3.MoveTowards(transform.position, destino, velocidadMovimiento * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                destino,
+                velocidadMovimiento * Time.deltaTime
+            );
         }
         else if (moviendo)
         {
-            // Si el enemigo está en el destino pero aún marcaba "moviendo", lo paramos
-            // (a menos que sea el ataque, que se gestiona solo)
-            if (Vector3.Distance(transform.position, destino) < 0.01f)
-            {
-                 // No reseteamos 'moviendo' aquí si se está ejecutando el ataque
-            }
+            moviendo = false;
+            if (animator != null) animator.SetBool("isMoving", false);
         }
     }
 
-    void OnDrawGizmosSelected()
+    public bool EsAtacando()
     {
-        Gizmos.color = (modoActual == ModoMovimiento.Lineal) ? Color.cyan : Color.magenta;
-        Vector3 inicio = (Application.isPlaying) ? posicionInicial : transform.position;
-        Vector3 pIzq = inicio + (Vector3.left * (limiteIzquierda * tamañoCasilla));
-        Vector3 pDer = inicio + (Vector3.right * (limiteDerecha * tamañoCasilla));
-        Gizmos.DrawLine(pIzq, pDer);
+        // El enemigo hace daño si se está moviendo a una casilla 
+        // O si está en medio de la corrutina de ataque.
+        return moviendo || atacando;
     }
 }

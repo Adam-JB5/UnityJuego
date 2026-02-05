@@ -132,14 +132,19 @@ public class MovimientoPorCasilla : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
+    {
+        // SOLO rebota si el usuario se está moviendo activamente (él intentó pisar al enemigo)
+        if (moviendo) 
         {
             volverAutomaticamente = false;
             destino = posicionAnterior;
-            moviendo = true;
-
+            // No cambiamos moviendo a true porque ya lo está
+            
             if (efectoAtaqueUsuario != null)
-                    StartCoroutine(ActivarEfectoConRetardo(efectoAtaqueUsuario, 0.52f));
+                StartCoroutine(ActivarEfectoConRetardo(efectoAtaqueUsuario, 0.52f));
         }
+        // Si el usuario estaba quieto y el enemigo le pegó, NO rebota el usuario.
+    }
 
         if (other.CompareTag("Pared") && !aturdido)
         {
@@ -177,4 +182,6 @@ public class MovimientoPorCasilla : MonoBehaviour
         yield return new WaitForSeconds(delay);
         efecto.SetActive(true);
     }
+
+    public bool EsAtacando() { return atacando || moviendo; }
 }
