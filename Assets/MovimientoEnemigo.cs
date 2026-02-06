@@ -23,6 +23,10 @@ public class EnemigoModularInteligente : MonoBehaviour
     public int probabilidadAtaque = 30;
     public Vector3 direccionAtaque = Vector3.forward;
 
+    [Header("Efectos de Feedback")]
+    public GameObject efectoImpactoEnemigo; // El efecto que se ve al golpear
+    public float retardoEfecto = 0.5f;      // Sincronizado con el impacto de la animación
+
     private Vector3 posicionInicial;
     private Vector3 destino;
     private Vector3 posicionAnterior;
@@ -30,9 +34,8 @@ public class EnemigoModularInteligente : MonoBehaviour
     private bool atacando = false;
     private int pasoActual = 0;
     private int direccionLineal = -1;
-
+    private Coroutine corrutinaAtaque;
     public Animator animator;
-    public GameObject efectoAtaqueEnemigo;
 
     void Start()
     {
@@ -46,6 +49,17 @@ public class EnemigoModularInteligente : MonoBehaviour
     {
         // El motor de movimiento siempre corre, igual que en tu usuario
         ManejarDesplazamientoVisual();
+    }
+
+    // Corrutina del efecto idéntica a la del usuario para mantener consistencia
+    IEnumerator ActivarEfectoConRetardo(GameObject efecto, float delay)
+    {
+        if (efecto == null) yield break;
+
+        efecto.SetActive(false);
+        yield return null; // Pequeño reset
+        yield return new WaitForSeconds(delay);
+        efecto.SetActive(true);
     }
 
     IEnumerator RutinaMovimiento()
@@ -62,7 +76,8 @@ public class EnemigoModularInteligente : MonoBehaviour
 
                 if (dado <= probabilidadAtaque)
                 {
-                    StartCoroutine(AtacarComoUsuario());
+                    // Guardamos la referencia para poder detenerla luego
+                    corrutinaAtaque = StartCoroutine(AtacarComoUsuario());
                 }
                 else
                 {
@@ -103,22 +118,26 @@ public class EnemigoModularInteligente : MonoBehaviour
         atacando = false;
     }
 
+    // 3. Modifica el OnTriggerEnter
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("User") || other.CompareTag("Player"))
         {
-            // El enemigo siempre vuelve a su casilla al tocar al jugador
             destino = posicionAnterior;
             moviendo = true;
 
-            if (efectoAtaqueEnemigo != null)
+            if (efectoImpactoEnemigo != null)
             {
-                efectoAtaqueEnemigo.SetActive(false);
-                efectoAtaqueEnemigo.SetActive(true);
+                StartCoroutine(ActivarEfectoConRetardo(efectoImpactoEnemigo, retardoEfecto));
             }
 
-            // Opcional: Si quieres detener la corrutina de ataque para que no intente seguir avanzando
-            StopCoroutine("AtacarComoUsuario");
+            // CORRECCIÓN AQUÍ: Detenemos la referencia guardada
+            if (corrutinaAtaque != null)
+            {
+                StopCoroutine(corrutinaAtaque);
+                corrutinaAtaque = null;
+            }
+
             atacando = false;
         }
     }

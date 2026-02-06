@@ -19,9 +19,9 @@ public class MovimientoPorCasilla : MonoBehaviour
     private Renderer rend;
     private Color colorOriginal;
 
+    [Header("Animator y efectos")]
     public Animator animator; // Animator del personaje hijo
     public GameObject efectoAturdido;
-    public GameObject efectoAtaqueEnemigo;
     public GameObject efectoAtaqueUsuario;
     public GameObject efectoMuerte;
 
