@@ -10,6 +10,7 @@ public class HealthJugador : MonoBehaviour
     [Header("Referencias")]
     public Animator animator;
     public GameObject canvasGameOver; // <--- Cambiado para el jugador
+    public ShakeUI shakeScript;
 
     void Awake()
     {
@@ -29,6 +30,13 @@ public class HealthJugador : MonoBehaviour
         {
             animator.SetTrigger("hit"); // Asegúrate de que tu animador tenga este trigger
         }
+
+        // --- NUEVO: Activa la sacudida de los corazones ---
+        if (shakeScript != null)
+        {
+            shakeScript.Shake();
+        }
+        // -------------------------------------------------
 
         if (currentHealth <= 0)
         {

@@ -3,6 +3,7 @@ using System.Collections;
 
 public class MovimientoPorCasilla : MonoBehaviour
 {
+    [Header("Propiedades generales")]
     public float tamañoCasilla = 1f;
     public float velocidadMovimiento = 20f;
 

@@ -13,12 +13,15 @@ public class Health : MonoBehaviour
     public Animator animator;
     public GameObject canvasVictoryMenu;
 
+    [Header("Efectos")]
+    public ShakeUI shakeScript;
+    public GameObject efectoMuerteFinal; // <--- NUEVO: Arrastra aquí tu efecto épico
+
     void Awake()
     {
         currentHealth = maxHealth;
         isDead = false;
 
-        // Si no asignaste el animator manualmente, intenta buscarlo
         if (animator == null) animator = GetComponentInChildren<Animator>();
     }
 
@@ -28,10 +31,16 @@ public class Health : MonoBehaviour
 
         currentHealth -= amount;
 
-        // 1. DISPARAR ANIMACIÓN DE GOLPE (Hurt/GetHit)
+        // 1. DISPARAR ANIMACIÓN DE GOLPE
         if (animator != null && currentHealth > 0)
         {
             animator.SetTrigger("hit");
+        }
+
+        // 2. Activa el Shake si la referencia existe
+        if (shakeScript != null)
+        {
+            shakeScript.Shake();
         }
 
         if (currentHealth <= 0)
@@ -46,27 +55,40 @@ public class Health : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
+        // LÓGICA DE ACTIVAR OBJETO EXISTENTE
+        if (efectoMuerteFinal != null)
+        {
+            // En lugar de crear uno nuevo, simplemente activamos el que ya existe
+            efectoMuerteFinal.SetActive(true);
+
+            // Si el efecto es hijo del enemigo y el enemigo se desactiva,
+            // el efecto también se apagará. Si quieres que siga brillando,
+            // tenemos que "sacarlo" del padre:
+            efectoMuerteFinal.transform.SetParent(null);
+        }
+
         if (animator != null) animator.SetBool("isDead", true);
 
-        // Detener movimiento
         var movimiento = GetComponent<EnemigoModularInteligente>();
         if (movimiento != null) movimiento.enabled = false;
 
-        // Lanzar la secuencia de victoria
         StartCoroutine(SecuenciaVictoriaDramatica());
     }
 
     IEnumerator SecuenciaVictoriaDramatica()
     {
+        // Iniciamos la cámara lenta
         Time.timeScale = 0.2f;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
 
+        // Esperamos 2 segundos en tiempo REAL (porque el tiempo del juego está casi parado)
         yield return new WaitForSecondsRealtime(2f);
 
+        // Restauramos el tiempo
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
 
-        // 4. MOSTRAR EL MENÚ (Usando la referencia directa)
+        // MOSTRAR EL MENÚ
         if (canvasVictoryMenu != null)
         {
             canvasVictoryMenu.SetActive(true);
