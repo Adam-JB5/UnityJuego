@@ -149,7 +149,7 @@ public class MovimientoPorCasilla : MonoBehaviour
                 // No cambiamos moviendo a true porque ya lo está
 
                 if (efectoAtaqueUsuario != null)
-                    StartCoroutine(ActivarEfectoConRetardo(efectoAtaqueUsuario, 0.52f));
+                    StartCoroutine(ActivarEfectoConRetardo(efectoAtaqueUsuario, 0.4f));
             }
             // Si el usuario estaba quieto y el enemigo le pegó, NO rebota el usuario.
         }
