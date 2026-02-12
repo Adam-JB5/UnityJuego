@@ -7,6 +7,9 @@ public class MovimientoPorCasilla : MonoBehaviour
     public float tamañoCasilla = 1f;
     public float velocidadMovimiento = 20f;
 
+    [Header("Stun")]
+    public float tiempoStun = 1f;
+
     private bool moviendo = false;
     private bool atacando = false;
     private bool aturdido = false;
@@ -23,6 +26,7 @@ public class MovimientoPorCasilla : MonoBehaviour
     [Header("Animator y efectos")]
     public Animator animator; // Animator del personaje hijo
     public GameObject efectoAturdido;
+    public GameObject areaAturdido;
     public GameObject efectoAtaqueUsuario;
     public GameObject efectoMuerte;
 
@@ -39,6 +43,9 @@ public class MovimientoPorCasilla : MonoBehaviour
 
         if (efectoAturdido != null)
             efectoAturdido.SetActive(false);
+
+        if (areaAturdido != null)
+            areaAturdido.SetActive(false);
     }
 
     void Update()
@@ -63,7 +70,7 @@ public class MovimientoPorCasilla : MonoBehaviour
                 atacando = true;
                 animator.SetTrigger("attack2");
 
-                
+
             }
 
             if (Input.GetKeyDown(KeyCode.A))
@@ -133,19 +140,19 @@ public class MovimientoPorCasilla : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
-    {
-        // SOLO rebota si el usuario se está moviendo activamente (él intentó pisar al enemigo)
-        if (moviendo) 
         {
-            volverAutomaticamente = false;
-            destino = posicionAnterior;
-            // No cambiamos moviendo a true porque ya lo está
-            
-            if (efectoAtaqueUsuario != null)
-                StartCoroutine(ActivarEfectoConRetardo(efectoAtaqueUsuario, 0.52f));
+            // SOLO rebota si el usuario se está moviendo activamente (él intentó pisar al enemigo)
+            if (moviendo)
+            {
+                volverAutomaticamente = false;
+                destino = posicionAnterior;
+                // No cambiamos moviendo a true porque ya lo está
+
+                if (efectoAtaqueUsuario != null)
+                    StartCoroutine(ActivarEfectoConRetardo(efectoAtaqueUsuario, 0.52f));
+            }
+            // Si el usuario estaba quieto y el enemigo le pegó, NO rebota el usuario.
         }
-        // Si el usuario estaba quieto y el enemigo le pegó, NO rebota el usuario.
-    }
 
         if (other.CompareTag("Pared") && !aturdido)
         {
@@ -156,6 +163,9 @@ public class MovimientoPorCasilla : MonoBehaviour
 
             if (efectoAturdido != null)
                 efectoAturdido.SetActive(true);
+
+            if (areaAturdido != null)
+                areaAturdido.SetActive(true);
         }
     }
 
@@ -166,10 +176,13 @@ public class MovimientoPorCasilla : MonoBehaviour
         animator.SetBool("isDizzy", true);
         rend.material.color = Color.yellow;
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(tiempoStun);
 
         if (efectoAturdido != null)
             efectoAturdido.SetActive(false);
+
+        if (areaAturdido != null)
+            areaAturdido.SetActive(false);
 
         rend.material.color = colorOriginal;
         animator.SetBool("isDizzy", false);
