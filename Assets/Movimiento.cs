@@ -7,6 +7,12 @@ public class MovimientoPorCasilla : MonoBehaviour
     public float tamañoCasilla = 1f;
     public float velocidadMovimiento = 20f;
 
+    [Header("Configuración Swipe")]
+    [Tooltip("Distancia mínima en píxeles para que se considere un swipe")]
+    public float pixelDistanciaMinima = 50f; 
+    private Vector2 inicioToque;
+    private Vector2 finToque;
+
     [Header("Stun")]
     public float tiempoStun = 1f;
 
@@ -24,7 +30,7 @@ public class MovimientoPorCasilla : MonoBehaviour
     private Color colorOriginal;
 
     [Header("Animator y efectos")]
-    public Animator animator; // Animator del personaje hijo
+    public Animator animator; 
     public GameObject efectoAturdido;
     public GameObject areaAturdido;
     public GameObject efectoAtaqueUsuario;
@@ -34,88 +40,83 @@ public class MovimientoPorCasilla : MonoBehaviour
     {
         destino = transform.position;
         posicionAnterior = transform.position;
-
         rend = GetComponent<Renderer>();
         colorOriginal = rend.material.color;
 
-        if (efectoAtaqueUsuario != null)
-            efectoAtaqueUsuario.SetActive(false);
-
-        if (efectoAturdido != null)
-            efectoAturdido.SetActive(false);
-
-        if (areaAturdido != null)
-            areaAturdido.SetActive(false);
+        if (efectoAtaqueUsuario != null) efectoAtaqueUsuario.SetActive(false);
+        if (efectoAturdido != null) efectoAturdido.SetActive(false);
+        if (areaAturdido != null) areaAturdido.SetActive(false);
     }
 
     void Update()
     {
-        if (aturdido)
-            return;
+        if (aturdido) return;
 
         Vector3 direccion = Vector3.zero;
 
-        // INPUT
+        // INPUT: Combinación de Teclado y Touch
         if (!moviendo && !atacando && transform.position == destino)
         {
-            movimientoAdelante = false;
+            // 1. Detección por Teclado (Para PC)
+            if (Input.GetKeyDown(KeyCode.W)) direccion = Vector3.forward;
+            else if (Input.GetKeyDown(KeyCode.A)) direccion = Vector3.left;
+            else if (Input.GetKeyDown(KeyCode.D)) direccion = Vector3.right;
+            else if (Input.GetKeyDown(KeyCode.S)) direccion = Vector3.back; // Opcional: añadir atrás
 
-            if (Input.GetKeyDown(KeyCode.W))
+            // 2. Detección por Swipe (Para Android)
+            if (Input.touchCount > 0)
             {
-                direccion = Vector3.forward;
-                movimientoAdelante = true;
-                volverAutomaticamente = true;
+                Touch t = Input.GetTouch(0);
 
-                // ATAQUE SIEMPRE
-                atacando = true;
-                animator.SetTrigger("attack2");
-
-
+                if (t.phase == TouchPhase.Began)
+                {
+                    inicioToque = t.position;
+                }
+                else if (t.phase == TouchPhase.Ended)
+                {
+                    finToque = t.position;
+                    direccion = CalcularDireccionSwipe();
+                }
             }
 
-            if (Input.GetKeyDown(KeyCode.A))
-                direccion = Vector3.left;
-
-            if (Input.GetKeyDown(KeyCode.D))
-                direccion = Vector3.right;
-
+            // Procesar el movimiento si hay una dirección
             if (direccion != Vector3.zero)
             {
+                movimientoAdelante = (direccion == Vector3.forward);
+                
+                if (movimientoAdelante)
+                {
+                    volverAutomaticamente = true;
+                    atacando = true;
+                    animator.SetTrigger("attack2");
+                }
+                else
+                {
+                    animator.SetBool("isMoving", true);
+                }
+
                 posicionAnterior = transform.position;
                 destino = transform.position + direccion * tamañoCasilla;
                 moviendo = true;
-
-                if (!movimientoAdelante)
-                    animator.SetBool("isMoving", true);
             }
         }
 
-        // Guardamos posición visual del personaje
+        // LÓGICA DE MOVIMIENTO VISUAL (Igual que el tuyo)
         Vector3 personajePosicion = animator.transform.position;
 
-        // Movimiento del cubo
         if (transform.position != destino)
         {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                destino,
-                velocidadMovimiento * Time.deltaTime
-            );
+            transform.position = Vector3.MoveTowards(transform.position, destino, velocidadMovimiento * Time.deltaTime);
         }
 
-        // El personaje no se desplaza al atacar
         if (movimientoAdelante)
             animator.transform.position = personajePosicion;
 
-        // LLEGADA
         if (moviendo && transform.position == destino)
         {
             moviendo = false;
+            if (!movimientoAdelante) animator.SetBool("isMoving", false);
 
-            if (!movimientoAdelante)
-                animator.SetBool("isMoving", false);
-
-            // Vuelta automática si no pasó nada
             if (movimientoAdelante && volverAutomaticamente)
             {
                 destino = posicionAnterior;
@@ -125,15 +126,35 @@ public class MovimientoPorCasilla : MonoBehaviour
             }
 
             movimientoAdelante = false;
-
-            if (atacando)
-                atacando = false;
+            if (atacando) atacando = false;
 
             if (castigoPendiente)
             {
                 castigoPendiente = false;
                 StartCoroutine(Aturdir());
             }
+        }
+    }
+
+    // Nueva función para procesar el deslizamiento del dedo
+    Vector3 CalcularDireccionSwipe()
+    {
+        Vector2 diferencia = finToque - inicioToque;
+
+        // Verificar si el swipe es lo suficientemente largo
+        if (diferencia.magnitude < pixelDistanciaMinima)
+            return Vector3.zero;
+
+        // Determinar si fue más horizontal o vertical
+        if (Mathf.Abs(diferencia.x) > Mathf.Abs(diferencia.y))
+        {
+            // Horizontal
+            return diferencia.x > 0 ? Vector3.right : Vector3.left;
+        }
+        else
+        {
+            // Vertical
+            return diferencia.y > 0 ? Vector3.forward : Vector3.back;
         }
     }
 
