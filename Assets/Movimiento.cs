@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class MovimientoPorCasilla : MonoBehaviour
 {
@@ -35,6 +36,10 @@ public class MovimientoPorCasilla : MonoBehaviour
     public GameObject areaAturdido;
     public GameObject efectoAtaqueUsuario;
     public GameObject efectoMuerte;
+
+    [Header("Sonidos")]
+    public AudioSource audioSource;
+    public AudioClip sonidoAturdido;
 
     void Start()
     {
@@ -196,6 +201,9 @@ public class MovimientoPorCasilla : MonoBehaviour
 
         animator.SetBool("isDizzy", true);
         rend.material.color = Color.yellow;
+
+        if (audioSource != null && sonidoAturdido != null)
+            audioSource.PlayOneShot(sonidoAturdido, 0.8f);
 
         yield return new WaitForSeconds(tiempoStun);
 

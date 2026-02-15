@@ -17,6 +17,11 @@ public class Health : MonoBehaviour
     public ShakeUI shakeScript;
     public GameObject efectoMuerteFinal; // <--- NUEVO: Arrastra aquí tu efecto épico
 
+    [Header("Sonidos")]
+    public AudioSource audioSource;
+    public AudioClip sonidoImpacto;
+    public AudioClip sonidoMuerte;
+
     void Awake()
     {
         currentHealth = maxHealth;
@@ -30,6 +35,10 @@ public class Health : MonoBehaviour
         if (isDead) return;
 
         currentHealth -= amount;
+
+        // --- SONIDO DE IMPACTO ---
+        if (audioSource != null && sonidoImpacto != null)
+            audioSource.PlayOneShot(sonidoImpacto, 1.2f);
 
         // 1. DISPARAR ANIMACIÓN DE GOLPE
         if (animator != null && currentHealth > 0)
@@ -54,6 +63,10 @@ public class Health : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+
+        // --- SONIDO DE MUERTE ---
+        if (audioSource != null && sonidoMuerte != null)
+            audioSource.PlayOneShot(sonidoMuerte, 1.2f);
 
         // LÓGICA DE ACTIVAR OBJETO EXISTENTE
         if (efectoMuerteFinal != null)

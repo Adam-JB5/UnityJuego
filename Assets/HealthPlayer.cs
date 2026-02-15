@@ -12,6 +12,11 @@ public class HealthJugador : MonoBehaviour
     public GameObject canvasGameOver; // <--- Cambiado para el jugador
     public ShakeUI shakeScript;
 
+    [Header("Sonidos")]
+    public AudioSource audioSource;
+    public AudioClip sonidoImpacto;
+    public AudioClip sonidoMuerte;
+
     void Awake()
     {
         currentHealth = maxHealth;
@@ -25,6 +30,10 @@ public class HealthJugador : MonoBehaviour
 
         currentHealth -= amount;
         Debug.Log("Jugador recibe daño. Vida restante: " + currentHealth);
+
+        // --- SONIDO DE IMPACTO ---
+        if (audioSource != null && sonidoImpacto != null)
+            audioSource.PlayOneShot(sonidoImpacto, 1.2f);
 
         if (animator != null && currentHealth > 0)
         {
@@ -49,6 +58,10 @@ public class HealthJugador : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+
+        // --- SONIDO DE MUERTE ---
+        if (audioSource != null && sonidoMuerte != null)
+            audioSource.PlayOneShot(sonidoMuerte, 1.2f);
 
         // 1. Lanzar animación de muerte
         if (animator != null) animator.SetBool("isDead", true);

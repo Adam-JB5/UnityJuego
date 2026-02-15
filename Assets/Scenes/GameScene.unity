@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571328, b: 0.3069217, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5873,6 +5873,7 @@ GameObject:
   - component: {fileID: 404545968}
   - component: {fileID: 404545970}
   - component: {fileID: 404545971}
+  - component: {fileID: 404545972}
   m_Layer: 0
   m_Name: User
   m_TagString: User
@@ -6011,12 +6012,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   "tama\xF1oCasilla": 12
   velocidadMovimiento: 20
+  pixelDistanciaMinima: 50
   tiempoStun: 2
   animator: {fileID: 1866219675}
   efectoAturdido: {fileID: 333390608}
   areaAturdido: {fileID: 1990207774}
   efectoAtaqueUsuario: {fileID: 848457013}
   efectoMuerte: {fileID: 1556213411}
+  audioSource: {fileID: 404545972}
+  sonidoAturdido: {fileID: 8300000, guid: 87ccb3474baf1684693a69cef68358fb, type: 3}
 --- !u!114 &404545970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6034,6 +6038,9 @@ MonoBehaviour:
   animator: {fileID: 1866219675}
   canvasGameOver: {fileID: 921359228}
   shakeScript: {fileID: 990568520}
+  audioSource: {fileID: 404545972}
+  sonidoImpacto: {fileID: 8300000, guid: ee6e069769d140543a26754f616a8663, type: 3}
+  sonidoMuerte: {fileID: 8300000, guid: cbe46ff031f800e44bb1c1dbc8a21d7b, type: 3}
 --- !u!114 &404545971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6048,6 +6055,102 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   targetTag: Enemy
+--- !u!82 &404545972
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404545962}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &470933250
 GameObject:
   m_ObjectHideFlags: 0
@@ -6096,10 +6199,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -6369,6 +6472,7 @@ GameObject:
   - component: {fileID: 571664401}
   - component: {fileID: 571664402}
   - component: {fileID: 571664403}
+  - component: {fileID: 571664404}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -6511,6 +6615,9 @@ MonoBehaviour:
   canvasVictoryMenu: {fileID: 1497062492}
   shakeScript: {fileID: 2096929373}
   efectoMuerteFinal: {fileID: 1052116013}
+  audioSource: {fileID: 571664404}
+  sonidoImpacto: {fileID: 8300000, guid: ee6e069769d140543a26754f616a8663, type: 3}
+  sonidoMuerte: {fileID: 8300000, guid: cbe46ff031f800e44bb1c1dbc8a21d7b, type: 3}
 --- !u!114 &571664401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6565,6 +6672,102 @@ MonoBehaviour:
   contenedor: {fileID: 1854386955}
   corazonLleno: {fileID: 21300000, guid: 8dae85e79aa4fae4abb2ddd940b51fb5, type: 3}
   corazonVacio: {fileID: 21300000, guid: fec592044c7a1be4bb847359191d351d, type: 3}
+--- !u!82 &571664404
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 571664393}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &618074049
 GameObject:
   m_ObjectHideFlags: 0
@@ -6741,12 +6944,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   "tama\xF1oCasilla": 12
   velocidadMovimiento: 20
+  pixelDistanciaMinima: 50
   tiempoStun: 1
   animator: {fileID: 0}
   efectoAturdido: {fileID: 0}
   areaAturdido: {fileID: 0}
   efectoAtaqueUsuario: {fileID: 0}
   efectoMuerte: {fileID: 0}
+  audioSource: {fileID: 0}
+  sonidoAturdido: {fileID: 0}
 --- !u!54 &696831531
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8081,15 +8287,15 @@ RectTransform:
   m_GameObject: {fileID: 990568516}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 470933254}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 60, y: -60}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 135, y: -80}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &990568518
 MonoBehaviour:
@@ -10274,12 +10480,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   "tama\xF1oCasilla": 12
   velocidadMovimiento: 20
+  pixelDistanciaMinima: 50
   tiempoStun: 1
   animator: {fileID: 0}
   efectoAturdido: {fileID: 0}
   areaAturdido: {fileID: 0}
   efectoAtaqueUsuario: {fileID: 0}
   efectoMuerte: {fileID: 0}
+  audioSource: {fileID: 0}
+  sonidoAturdido: {fileID: 0}
 --- !u!54 &1911072482
 Rigidbody:
   m_ObjectHideFlags: 0
