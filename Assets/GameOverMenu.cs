@@ -13,6 +13,6 @@ public class GameOverMenu : MonoBehaviour
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenuScene"); // <-- ESCRIBE AQUÍ EL NOMBRE DE TU MENÚ
+        SceneManager.LoadScene("MainMenuScene");
     }
 }

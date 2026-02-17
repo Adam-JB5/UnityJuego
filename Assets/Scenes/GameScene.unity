@@ -6670,8 +6670,8 @@ MonoBehaviour:
   scriptSalud: {fileID: 571664400}
   prefabCorazon: {fileID: 1257584235}
   contenedor: {fileID: 1854386955}
-  corazonLleno: {fileID: 21300000, guid: 8dae85e79aa4fae4abb2ddd940b51fb5, type: 3}
-  corazonVacio: {fileID: 21300000, guid: fec592044c7a1be4bb847359191d351d, type: 3}
+  corazonLleno: {fileID: 21300000, guid: efef796c54e612c49855db4867b25181, type: 3}
+  corazonVacio: {fileID: 21300000, guid: b586a2a154d33c843a073eb5151d8f08, type: 3}
 --- !u!82 &571664404
 AudioSource:
   m_ObjectHideFlags: 0
@@ -8311,8 +8311,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthJugador: {fileID: 404545970}
   prefabCorazon: {fileID: 1257584235}
-  corazonLleno: {fileID: 21300000, guid: f2692e22cf34acf4889c3a931bfc6623, type: 3}
-  corazonVacio: {fileID: 21300000, guid: 766429efa1441c643a1db4bfaca4f7a4, type: 3}
+  corazonLleno: {fileID: 21300000, guid: 210544371da33e640b70306e06547bbc, type: 3}
+  corazonVacio: {fileID: 21300000, guid: 7b86c4b017b7feb4ea4e8dec381c09d9, type: 3}
 --- !u!114 &990568519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8352,7 +8352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   duracion: 0.2
-  fuerza: 5
+  fuerza: 8
 --- !u!1001 &990764143
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11044,7 +11044,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!223 &2096929372
 Canvas:
   m_ObjectHideFlags: 0

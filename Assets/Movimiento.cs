@@ -199,20 +199,26 @@ public class MovimientoPorCasilla : MonoBehaviour
     {
         aturdido = true;
 
+        //Se activa la animación de aturdido
         animator.SetBool("isDizzy", true);
+        // El color se cambia para debugging
         rend.material.color = Color.yellow;
 
+        // Se reproduce el efecto de sonido
         if (audioSource != null && sonidoAturdido != null)
             audioSource.PlayOneShot(sonidoAturdido, 0.8f);
 
+        // Se bloquea al usuario durante el tiempo de stun
         yield return new WaitForSeconds(tiempoStun);
 
+        // Se activan los 2 efectos
         if (efectoAturdido != null)
             efectoAturdido.SetActive(false);
 
         if (areaAturdido != null)
             areaAturdido.SetActive(false);
 
+        // Se reinicia la animación y el estado
         rend.material.color = colorOriginal;
         animator.SetBool("isDizzy", false);
         aturdido = false;
