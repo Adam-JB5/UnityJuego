@@ -100,7 +100,14 @@ public class EnemigoModularInteligente : MonoBehaviour
         destino = transform.position + direccionAtaque * tamañoCasilla;
         moviendo = true;
 
-        if (animator != null) animator.SetTrigger("attack"); // Ajusta el nombre si es attack2
+        if (animator != null)
+        {
+            // 50/50 de probabilidad
+            if (Random.value < 0.5f)
+                animator.SetTrigger("attack");
+            else
+                animator.SetTrigger("attack2");
+        }
 
         // Esperamos a que llegue al destino (el impacto)
         yield return new WaitUntil(() => transform.position == destino);
