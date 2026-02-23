@@ -10,7 +10,7 @@ public class MovimientoPorCasilla : MonoBehaviour
 
     [Header("Configuración Swipe")]
     [Tooltip("Distancia mínima en píxeles para que se considere un swipe")]
-    public float pixelDistanciaMinima = 50f; 
+    public float pixelDistanciaMinima = 50f;
     private Vector2 inicioToque;
     private Vector2 finToque;
 
@@ -31,7 +31,7 @@ public class MovimientoPorCasilla : MonoBehaviour
     private Color colorOriginal;
 
     [Header("Animator y efectos")]
-    public Animator animator; 
+    public Animator animator;
     public GameObject efectoAturdido;
     public GameObject areaAturdido;
     public GameObject efectoAtaqueUsuario;
@@ -65,8 +65,7 @@ public class MovimientoPorCasilla : MonoBehaviour
             // 1. Detección por Teclado (Para PC)
             if (Input.GetKeyDown(KeyCode.W)) direccion = Vector3.forward;
             else if (Input.GetKeyDown(KeyCode.A)) direccion = Vector3.left;
-            else if (Input.GetKeyDown(KeyCode.D)) direccion = Vector3.right;
-            else if (Input.GetKeyDown(KeyCode.S)) direccion = Vector3.back; // Opcional: añadir atrás
+            else if (Input.GetKeyDown(KeyCode.D)) direccion = Vector3.right; // Opcional: añadir atrás
 
             // 2. Detección por Swipe (Para Android)
             if (Input.touchCount > 0)
@@ -88,7 +87,7 @@ public class MovimientoPorCasilla : MonoBehaviour
             if (direccion != Vector3.zero)
             {
                 movimientoAdelante = (direccion == Vector3.forward);
-                
+
                 if (movimientoAdelante)
                 {
                     volverAutomaticamente = true;
@@ -158,8 +157,16 @@ public class MovimientoPorCasilla : MonoBehaviour
         }
         else
         {
-            // Vertical
-            return diferencia.y > 0 ? Vector3.forward : Vector3.back;
+            // Vertical: Solo permitimos hacia arriba (forward)
+            if (diferencia.y > 0)
+            {
+                return Vector3.forward;
+            }
+            else
+            {
+                // Si es hacia abajo, no devolvemos dirección
+                return Vector3.zero;
+            }
         }
     }
 
