@@ -3,11 +3,13 @@ using UnityEngine.SceneManagement;
 
 public class VictoryMenu : MonoBehaviour
 {
+
+    public string siguienteNivel;
     // Función para el botón de Siguiente Nivel
     public void NextLevel()
     {
         Time.timeScale = 1f; // Reset del tiempo por si hubo cámara lenta
-        SceneManager.LoadScene("Level2Scene");
+        SceneManager.LoadScene(siguienteNivel);
     }
 
     // Función para el botón de Salir al Menú Principal
